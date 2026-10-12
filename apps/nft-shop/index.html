@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NFT Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">NFT Shop</span>
+    <div id="wallet-chip" class="chip" hidden>
+      <span class="dot"></span>
+      <span id="chip-network"></span>
+      <span class="chip-sep"></span>
+      <button id="copy-address" class="chip-btn" title="Copiar dirección"></button>
+      <button id="disconnect" class="chip-btn subtle" title="Desconectar">Salir</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Bienvenida: antes de conectar -->
+    <section id="connect-view" class="hero">
+      <div id="hero-art" class="art art-hero" aria-hidden="true"></div>
+      <h1>Comprá un NFT con tus tokens</h1>
+      <p class="lead">Conectá tu wallet, elegí la colección y pagá con el ERC-20 que ya tenés. Todo se confirma desde MetaMask.</p>
+      <button id="connect" class="btn btn-primary btn-lg">Conectar MetaMask</button>
+      <p id="no-metamask" class="hint" hidden>
+        No encontramos MetaMask en este navegador.
+        <a href="https://metamask.io/download/" target="_blank" rel="noopener">Instalá la extensión</a> y recargá la página.
+      </p>
+    </section>
+
+    <!-- App: después de conectar -->
+    <section id="app-view" hidden>
+      <ol class="steps" aria-label="Progreso">
+        <li class="done">Wallet</li>
+        <li id="step-contracts" class="current">Contratos</li>
+        <li id="step-buy">Compra</li>
+      </ol>
+
+      <!-- Contratos -->
+      <article class="card" id="contracts-card">
+        <div class="card-head">
+          <h2>Contratos</h2>
+          <button id="edit-contracts" class="btn btn-ghost" hidden>Editar</button>
+        </div>
+
+        <div id="contracts-form">
+          <div class="field">
+            <span class="field-label">Red</span>
+            <div id="networks" class="segmented" role="group" aria-label="Red"></div>
+            <p id="network-note" class="hint" hidden></p>
+          </div>
+          <label class="field">
+            <span class="field-label">Token de pago (ERC-20)</span>
+            <input id="token-address" placeholder="0x…" spellcheck="false" autocomplete="off">
+            <span class="field-error" id="token-error"></span>
+          </label>
+          <label class="field">
+            <span class="field-label">Colección (ERC-721)</span>
+            <input id="nft-address" placeholder="0x…" spellcheck="false" autocomplete="off">
+            <span class="field-error" id="nft-error"></span>
+          </label>
+          <button id="load" class="btn btn-primary btn-block">Usar estos contratos</button>
+        </div>
+
+        <dl id="contracts-summary" class="summary" hidden>
+          <dt>Token</dt><dd id="sum-token"></dd>
+          <dt>Colección</dt><dd id="sum-nft"></dd>
+        </dl>
+      </article>
+
+      <!-- Compra -->
+      <article class="card buy-card" id="shop" hidden>
+        <div id="nft-art" class="art" aria-hidden="true"></div>
+        <div class="buy-body">
+          <h2 id="nft-name" class="nft-name">…</h2>
+          <p class="owned" id="nft-owned"></p>
+
+          <div class="price">
+            <span class="price-label">Precio</span>
+            <span id="price" class="price-value">…</span>
+          </div>
+
+          <div class="balance">
+            <div class="balance-row">
+              <span>Tu saldo</span>
+              <strong id="balance">…</strong>
+            </div>
+            <div class="meter"><span id="meter-fill"></span></div>
+            <p id="balance-note" class="hint"></p>
+          </div>
+
+          <button id="buy" class="btn btn-primary btn-lg btn-block" disabled>Comprar</button>
+
+          <ol id="progress" class="progress" hidden>
+            <li id="p-approve"><span class="p-icon"></span><span class="p-text">Autorizar el pago</span><a class="p-link" target="_blank" rel="noopener" hidden>Ver</a></li>
+            <li id="p-buy"><span class="p-icon"></span><span class="p-text">Confirmar la compra</span><a class="p-link" target="_blank" rel="noopener" hidden>Ver</a></li>
+          </ol>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
