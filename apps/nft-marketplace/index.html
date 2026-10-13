@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NFT Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">NFT Marketplace</span>
+    <div id="wallet-chip" class="chip" hidden>
+      <span class="dot"></span>
+      <span id="chip-network"></span>
+      <span class="chip-sep"></span>
+      <button id="copy-address" class="chip-btn" title="Copiar dirección"></button>
+      <button id="disconnect" class="chip-btn subtle" title="Desconectar">Salir</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Bienvenida -->
+    <section id="connect-view" class="hero">
+      <div class="hero-stack" aria-hidden="true">
+        <div id="hero-art-1" class="art art-hero a1"></div>
+        <div id="hero-art-2" class="art art-hero a2"></div>
+      </div>
+      <h1>Comprá y vendé NFTs con el token que quieras</h1>
+      <p class="lead">Publicá cualquier NFT tuyo y elegí en qué token cobrás. El NFT queda en tu wallet hasta que alguien lo compra.</p>
+      <button id="connect" class="btn btn-primary btn-lg">Conectar MetaMask</button>
+      <p id="no-metamask" class="hint" hidden>
+        No encontramos MetaMask en este navegador.
+        <a href="https://metamask.io/download/" target="_blank" rel="noopener">Instalá la extensión</a> y recargá la página.
+      </p>
+    </section>
+
+    <section id="app-view" hidden>
+      <!-- Marketplace -->
+      <article class="card" id="market-card">
+        <div class="card-head">
+          <h2>Marketplace</h2>
+          <button id="edit-market" class="btn btn-ghost" hidden>Editar</button>
+        </div>
+        <div id="market-form">
+          <div class="field">
+            <span class="field-label">Red</span>
+            <div id="networks" class="segmented" role="group" aria-label="Red"></div>
+            <p id="network-note" class="hint" hidden></p>
+          </div>
+          <label class="field">
+            <span class="field-label">Dirección del contrato Marketplace</span>
+            <input id="market-address" placeholder="0x…" spellcheck="false" autocomplete="off">
+            <span class="field-error" id="market-error"></span>
+          </label>
+          <button id="load-market" class="btn btn-primary btn-block">Usar este marketplace</button>
+        </div>
+        <p id="market-summary" class="summary-line" hidden></p>
+      </article>
+
+      <div id="market-view" hidden>
+        <div class="tabs segmented segmented-lg" role="tablist">
+          <button role="tab" id="tab-browse" aria-selected="true">En venta</button>
+          <button role="tab" id="tab-sell" aria-selected="false">Vender</button>
+        </div>
+
+        <!-- En venta -->
+        <section id="browse-view">
+          <div class="list-head">
+            <p id="list-count" class="hint"></p>
+            <button id="refresh" class="btn btn-ghost">Actualizar</button>
+          </div>
+          <ul id="listings" class="listings"></ul>
+          <div id="empty" class="empty" hidden>
+            <p><strong>Todavía no hay NFTs a la venta.</strong></p>
+            <p class="hint">Publicá uno tuyo desde la pestaña Vender.</p>
+          </div>
+        </section>
+
+        <!-- Vender -->
+        <section id="sell-view" class="card" hidden>
+          <h2>Publicar un NFT</h2>
+          <p class="hint sell-intro">El NFT sigue en tu wallet. Autorizás al marketplace a transferirlo solo cuando alguien lo compre.</p>
+
+          <div class="row">
+            <label class="field grow">
+              <span class="field-label">Contrato del NFT (ERC-721)</span>
+              <input id="sell-nft" placeholder="0x…" spellcheck="false" autocomplete="off">
+            </label>
+            <label class="field id-field">
+              <span class="field-label">ID</span>
+              <input id="sell-id" inputmode="numeric" placeholder="1" autocomplete="off">
+            </label>
+          </div>
+          <p id="nft-check" class="check"></p>
+
+          <label class="field">
+            <span class="field-label">Cobrar en (ERC-20)</span>
+            <input id="sell-token" placeholder="0x…" spellcheck="false" autocomplete="off" list="known-tokens">
+            <datalist id="known-tokens"></datalist>
+          </label>
+          <p id="token-check" class="check"></p>
+
+          <label class="field">
+            <span class="field-label">Precio</span>
+            <div class="input-suffix">
+              <input id="sell-price" inputmode="decimal" placeholder="10" autocomplete="off">
+              <span id="price-suffix"></span>
+            </div>
+          </label>
+
+          <button id="publish" class="btn btn-primary btn-lg btn-block" disabled>Publicar</button>
+          <ol id="sell-progress" class="progress" hidden>
+            <li id="p-approve"><span class="p-icon"></span><span class="p-text">Autorizar al marketplace a transferir el NFT</span><a class="p-link" target="_blank" rel="noopener" hidden>Ver</a></li>
+            <li id="p-list"><span class="p-icon"></span><span class="p-text">Publicar</span><a class="p-link" target="_blank" rel="noopener" hidden>Ver</a></li>
+          </ol>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
