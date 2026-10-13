@@ -93,7 +93,8 @@ async function connect() {
     $("known-tokens").innerHTML = (s.net.knownTokens || [])
       .map((t) => `<option value="${t.address}">${t.symbol}</option>`).join("");
 
-    const saved = loadSaved().market || s.net.marketplace || "";
+    // La dirección fija de config.js tiene prioridad; si no hay, se usa la última ingresada
+    const saved = s.net.marketplace || loadSaved().market || "";
     $("market-address").value = saved;
     if (saved) await loadMarket();
   } catch (err) {

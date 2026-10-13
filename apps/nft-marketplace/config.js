@@ -16,7 +16,7 @@ export const NETWORKS = {
   11155111: {
     name: "Sepolia",
     explorer: "https://sepolia.etherscan.io",
-    marketplace: "", // pegá acá la dirección después de desplegar Marketplace.sol
+    marketplace: "0x3D1D8B52D5957848AC1a9064a0a8F018223d9C86", // Marketplace.sol desplegado
     knownTokens: [{ symbol: "MC", address: "0xc9264836CE2867D830Ee941686b18006e4F3Ced8" }],
   },
 };

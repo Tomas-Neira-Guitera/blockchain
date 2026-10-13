@@ -27,6 +27,8 @@ El precio se guarda en unidades mínimas del token (`uint96`, alcanza para ~79 m
 3. **Deploy & Run:** entorno *Injected Provider - MetaMask* en Sepolia, gas limit `8000000`. El constructor no tiene parámetros.
 4. Copiá la dirección desplegada y pegala en `config.js` (`NETWORKS[11155111].marketplace`) para que quede precargada, o ingresala desde la interfaz.
 
+**Desplegado en Sepolia:** `0x3D1D8B52D5957848AC1a9064a0a8F018223d9C86` (ya precargado en `config.js`).
+
 > Desde Glamsterdam (Sepolia, 6/10/2026) guardar código y datos nuevos cuesta mucho más gas. El deploy optimizado usa ~3,8M; publicar un NFT, unos cientos de miles.
 
 El contrato es deliberadamente mínimo: sin eventos ni librerías extra. La publicación se marca como vendida antes de mover tokens, lo que evita reentradas.
