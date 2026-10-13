@@ -3,68 +3,46 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-/// @title Marketplace
-/// @notice Compra y venta de cualquier NFT (ERC-721) con cualquier token (ERC-20).
-///         El vendedor elige en qué token cobra. El NFT queda en su wallet hasta que se vende:
-///         el marketplace solo necesita su autorización (approve) para transferirlo.
-contract Marketplace is ReentrancyGuard {
-    using SafeERC20 for IERC20;
-
+/// Marketplace mínimo: cualquier NFT (ERC-721) se vende por cualquier token (ERC-20).
+/// El NFT queda en la wallet del vendedor hasta que alguien lo compra.
+contract Marketplace {
     struct Listing {
-        address seller;  // dueño del NFT. address(0) = publicación vendida o cancelada
-        uint96 price;    // precio en unidades mínimas del token de pago
-        address nft;     // contrato ERC-721
-        address token;   // contrato ERC-20 con el que se cobra
-        uint256 tokenId; // id del NFT
+        address seller;  // address(0) = vendida o cancelada
+        uint96 price;    // en unidades mínimas del token
+        address nft;
+        address token;
+        uint256 tokenId;
     }
 
-    Listing[] private _listings;
+    Listing[] private listings;
 
-    event Listed(uint256 indexed id, address indexed seller, address indexed nft, uint256 tokenId, address token, uint256 price);
-    event Sold(uint256 indexed id, address indexed buyer);
-    event Cancelled(uint256 indexed id);
-
-    /// @notice Publica un NFT propio. Antes hay que autorizar al marketplace en el contrato del NFT
-    ///         (approve(marketplace, tokenId) o setApprovalForAll(marketplace, true)).
-    function list(address nft, uint256 tokenId, address token, uint96 price) external returns (uint256 id) {
-        require(price > 0, "Precio invalido");
+    /// Publicar. Antes: approve(marketplace, tokenId) en el contrato del NFT.
+    function list(address nft, uint256 tokenId, address token, uint96 price) external {
         require(IERC721(nft).ownerOf(tokenId) == msg.sender, "No sos el duenio del NFT");
-        require(_isApproved(nft, tokenId, msg.sender), "Falta autorizar al marketplace");
-
-        id = _listings.length;
-        _listings.push(Listing(msg.sender, price, nft, token, tokenId));
-        emit Listed(id, msg.sender, nft, tokenId, token, price);
+        require(price > 0, "Precio invalido");
+        listings.push(Listing(msg.sender, price, nft, token, tokenId));
     }
 
-    /// @notice Compra una publicación. Antes hay que hacer approve(marketplace, price) en el token de pago.
-    function buy(uint256 id) external nonReentrant {
-        Listing memory l = _listings[id];
+    /// Comprar. Antes: approve(marketplace, price) en el token de pago.
+    function buy(uint256 id) external {
+        Listing memory l = listings[id];
         require(l.seller != address(0), "Publicacion no disponible");
         require(l.seller != msg.sender, "No podes comprar tu propio NFT");
 
-        delete _listings[id]; // se marca como vendida antes de mover nada
-        IERC20(l.token).safeTransferFrom(msg.sender, l.seller, l.price);
+        delete listings[id]; // primero se marca como vendida
+        require(IERC20(l.token).transferFrom(msg.sender, l.seller, l.price), "Fallo el pago");
         IERC721(l.nft).transferFrom(l.seller, msg.sender, l.tokenId);
-        emit Sold(id, msg.sender);
     }
 
-    /// @notice Retira una publicación propia.
+    /// Retirar una publicación propia.
     function cancel(uint256 id) external {
-        require(_listings[id].seller == msg.sender, "No es tu publicacion");
-        delete _listings[id];
-        emit Cancelled(id);
+        require(listings[id].seller == msg.sender, "No es tu publicacion");
+        delete listings[id];
     }
 
-    /// @notice Todas las publicaciones. Las vendidas o canceladas tienen seller = address(0).
+    /// Todas las publicaciones (la app filtra las que tienen seller = 0).
     function getListings() external view returns (Listing[] memory) {
-        return _listings;
-    }
-
-    function _isApproved(address nft, uint256 tokenId, address owner) private view returns (bool) {
-        return IERC721(nft).getApproved(tokenId) == address(this)
-            || IERC721(nft).isApprovedForAll(owner, address(this));
+        return listings;
     }
 }

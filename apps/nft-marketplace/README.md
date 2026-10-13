@@ -14,7 +14,7 @@ El vendedor elige en qué token cobra. HTML + JS plano con ethers.js v6 y MetaMa
 
 | Función | Qué hace |
 | --- | --- |
-| `list(nft, tokenId, token, price)` | Publica un NFT propio. Requiere `approve` o `setApprovalForAll` previo en el NFT. |
+| `list(nft, tokenId, token, price)` | Publica un NFT propio. Para que se pueda vender, el NFT tiene que tener `approve` al marketplace (la app lo hace antes de publicar). |
 | `buy(id)` | Compra una publicación. Requiere `approve(marketplace, price)` en el token de pago. |
 | `cancel(id)` | Retira una publicación propia. |
 | `getListings()` | Devuelve todas las publicaciones (las vendidas o canceladas tienen `seller = 0x0`). |
@@ -27,7 +27,9 @@ El precio se guarda en unidades mínimas del token (`uint96`, alcanza para ~79 m
 3. **Deploy & Run:** entorno *Injected Provider - MetaMask* en Sepolia, gas limit `8000000`. El constructor no tiene parámetros.
 4. Copiá la dirección desplegada y pegala en `config.js` (`NETWORKS[11155111].marketplace`) para que quede precargada, o ingresala desde la interfaz.
 
-> Desde Glamsterdam (Sepolia, 6/10/2026) guardar código y datos nuevos cuesta mucho más gas. El deploy optimizado usa ~5,3M; publicar un NFT, unos cientos de miles.
+> Desde Glamsterdam (Sepolia, 6/10/2026) guardar código y datos nuevos cuesta mucho más gas. El deploy optimizado usa ~3,8M; publicar un NFT, unos cientos de miles.
+
+El contrato es deliberadamente mínimo: sin eventos ni librerías extra. La publicación se marca como vendida antes de mover tokens, lo que evita reentradas.
 
 ## Correr
 ```bash
