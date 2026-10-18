@@ -1,23 +1,17 @@
-// Redes conocidas. La dirección del marketplace se puede dejar precargada acá (marketplace)
-// o ingresarla desde la interfaz. knownTokens aparecen como sugerencia al vender.
-export const NETWORKS = {
-  31337: {
-    name: "Hardhat local",
-    explorer: null,
-    marketplace: "",
-    knownTokens: [],
-    addParams: {
-      chainId: "0x7a69",
-      chainName: "Hardhat local",
-      rpcUrls: ["http://127.0.0.1:8545"],
-      nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-    },
-  },
-  11155111: {
-    name: "Sepolia",
-    explorer: "https://sepolia.etherscan.io",
-    marketplace: "0x3D1D8B52D5957848AC1a9064a0a8F018223d9C86", // Marketplace.sol desplegado
-    knownTokens: [{ symbol: "MC", address: "0xc9264836CE2867D830Ee941686b18006e4F3Ced8" }],
+// Este marketplace funciona solo en la red de prueba Sepolia.
+export const NETWORK = {
+  chainId: 11155111,
+  name: "Sepolia",
+  explorer: "https://sepolia.etherscan.io",
+  marketplace: "0x3D1D8B52D5957848AC1a9064a0a8F018223d9C86", // Marketplace.sol desplegado
+  knownTokens: [{ symbol: "MC", address: "0xc9264836CE2867D830Ee941686b18006e4F3Ced8" }], // sugerencias al vender
+  // Por si MetaMask no tiene Sepolia configurada
+  addParams: {
+    chainId: "0xaa36a7",
+    chainName: "Sepolia",
+    rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
+    nativeCurrency: { name: "Sepolia Ether", symbol: "ETH", decimals: 18 },
+    blockExplorerUrls: ["https://sepolia.etherscan.io"],
   },
 };
 

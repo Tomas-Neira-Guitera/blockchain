@@ -347,3 +347,8 @@ main, .topbar { max-width: 640px; }
 /* Ayuda debajo del campo del marketplace */
 .field-hint { display: block; margin-top: 6px; font-size: 13px; }
 .field-hint code { font-size: 12px; background: var(--surface-2); padding: 1px 5px; border-radius: 6px; }
+
+/* Solo Sepolia */
+.dot.warn { background: var(--err); }
+.wrong-net h2 { font-size: 20px; margin-bottom: 6px; }
+.wrong-net .hint { margin: 0 0 16px; }

@@ -1,5 +1,5 @@
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.min.js";
-import { NETWORKS, MARKET_ABI, ERC20_ABI, ERC721_ABI } from "./config.js";
+import { NETWORK, MARKET_ABI, ERC20_ABI, ERC721_ABI } from "./config.js";
 
 const $ = (id) => document.getElementById(id);
 const s = {}; // estado: provider, signer, account, chainId, net, market, marketAddress
@@ -80,21 +80,29 @@ async function connect() {
     s.provider = new ethers.BrowserProvider(window.ethereum);
     await s.provider.send("eth_requestAccounts", []);
     s.chainId = Number((await s.provider.getNetwork()).chainId);
-    s.net = NETWORKS[s.chainId] || { name: `Red ${s.chainId}`, explorer: null, knownTokens: [] };
+    s.net = NETWORK;
     s.signer = await s.provider.getSigner();
     s.account = await s.signer.getAddress();
 
     $("connect-view").hidden = true;
     $("app-view").hidden = false;
     $("wallet-chip").hidden = false;
-    $("chip-network").textContent = s.net.name;
     $("copy-address").textContent = short(s.account);
-    renderNetworks();
-    $("known-tokens").innerHTML = (s.net.knownTokens || [])
+
+    // Solo Sepolia: en otra red mostramos el aviso para cambiar y nada más
+    if (s.chainId !== NETWORK.chainId) {
+      $("chip-network").textContent = "Otra red";
+      document.querySelector("#wallet-chip .dot").classList.add("warn");
+      $("wrong-network").hidden = false;
+      $("market-card").hidden = true;
+      return;
+    }
+    $("chip-network").textContent = NETWORK.name;
+    $("known-tokens").innerHTML = NETWORK.knownTokens
       .map((t) => `<option value="${t.address}">${t.symbol}</option>`).join("");
 
     // La dirección fija de config.js tiene prioridad; si no hay, se usa la última ingresada
-    const saved = s.net.marketplace || loadSaved().market || "";
+    const saved = NETWORK.marketplace || loadSaved().market || "";
     $("market-address").value = saved;
     if (saved) await loadMarket();
   } catch (err) {
@@ -104,29 +112,12 @@ async function connect() {
   }
 }
 
-function renderNetworks() {
-  const box = $("networks");
-  box.innerHTML = "";
-  for (const [id, n] of Object.entries(NETWORKS)) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = n.name;
-    b.setAttribute("aria-pressed", String(Number(id) === s.chainId));
-    b.onclick = () => Number(id) !== s.chainId && switchNetwork(id);
-    box.appendChild(b);
-  }
-  const known = NETWORKS[s.chainId];
-  $("network-note").hidden = !!known;
-  $("network-note").textContent = known ? "" : `Estás en otra red (chainId ${s.chainId}). Podés seguir igual o cambiar a una de estas.`;
-}
-
-async function switchNetwork(id) {
-  const hex = "0x" + Number(id).toString(16);
+async function switchNetwork() {
   try {
-    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] });
+    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: NETWORK.addParams.chainId }] });
   } catch (err) {
-    if (err.code === 4902 && NETWORKS[id].addParams) {
-      try { await window.ethereum.request({ method: "wallet_addEthereumChain", params: [NETWORKS[id].addParams] }); }
+    if (err.code === 4902) { // MetaMask no tiene Sepolia: la agregamos
+      try { await window.ethereum.request({ method: "wallet_addEthereumChain", params: [NETWORK.addParams] }); }
       catch (e) { toast(errorMessage(e), "error"); }
     } else toast(errorMessage(err), "error");
   }
@@ -435,6 +426,7 @@ renderArt($("hero-art-1"), "marketplace-1");
 renderArt($("hero-art-2"), "marketplace-2");
 $("connect").onclick = connect;
 $("disconnect").onclick = disconnect;
+$("switch-network").onclick = switchNetwork;
 $("copy-address").onclick = async () => {
   try { await navigator.clipboard.writeText(s.account); toast("Dirección copiada."); } catch {}
 };

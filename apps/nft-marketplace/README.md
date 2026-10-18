@@ -3,6 +3,8 @@
 Marketplace mínimo para comprar y vender **cualquier NFT (ERC-721) con cualquier token (ERC-20)**.
 El vendedor elige en qué token cobra. HTML + JS plano con ethers.js v6 y MetaMask, sin build.
 
+Funciona **solo en Sepolia**: si MetaMask está en otra red, la app pide cambiar a Sepolia.
+
 ## Cómo funciona
 - **Vender:** el dueño de un NFT lo publica con un precio en el token que quiera. El NFT **queda en su wallet**: solo autoriza al marketplace (`approve`) a transferirlo cuando alguien lo compre.
 - **Comprar:** el comprador autoriza el pago en el token de la publicación y llama a `buy`. En una sola transacción los tokens van al vendedor y el NFT al comprador.
