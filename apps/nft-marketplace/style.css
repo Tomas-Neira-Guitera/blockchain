@@ -343,3 +343,7 @@ main, .topbar { max-width: 640px; }
   .tip:not([hidden]) { animation: tip-in .15s ease-out; }
   @keyframes tip-in { from { opacity: 0; transform: translateY(-4px); } }
 }
+
+/* Ayuda debajo del campo del marketplace */
+.field-hint { display: block; margin-top: 6px; font-size: 13px; }
+.field-hint code { font-size: 12px; background: var(--surface-2); padding: 1px 5px; border-radius: 6px; }

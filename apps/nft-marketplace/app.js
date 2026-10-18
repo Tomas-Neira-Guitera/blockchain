@@ -158,10 +158,28 @@ async function loadMarket() {
     showMarketForm(false);
     await loadListings();
   } catch {
-    fail("Ese contrato no parece ser el Marketplace. Revisá la dirección.");
+    fail(await whatIsIt(addr));
   } finally {
     btn.disabled = false; btn.textContent = "Usar este marketplace";
   }
+}
+
+// Si pegaron la dirección de un NFT o de un token, decirle cuál es
+async function whatIsIt(addr) {
+  const c = new ethers.Contract(addr, [
+    "function supportsInterface(bytes4) view returns (bool)",
+    "function name() view returns (string)",
+    "function symbol() view returns (string)",
+    "function decimals() view returns (uint8)",
+  ], s.provider);
+  const name = await c.name().catch(() => null);
+  if (await c.supportsInterface("0x80ac58cd").catch(() => false))
+    return `Esa dirección es la colección ${name ? `"${name}"` : ""} (un NFT), no el Marketplace. Usala en Vender, como "Contrato del NFT".`;
+  if (await c.decimals().then(() => true).catch(() => false)) {
+    const sym = await c.symbol().catch(() => name);
+    return `Esa dirección es el token ${sym ? `"${sym}"` : ""}, no el Marketplace. Usala en Vender, en "Cobrar en".`;
+  }
+  return "Ese contrato no es el Marketplace. Revisá la dirección.";
 }
 
 function showMarketForm(show) {
