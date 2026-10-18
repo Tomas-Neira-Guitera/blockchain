@@ -41,7 +41,10 @@
       <!-- Marketplace -->
       <article class="card" id="market-card">
         <div class="card-head">
-          <h2>Marketplace</h2>
+          <div class="title-tip">
+            <h2>Marketplace</h2>
+            <button class="info-btn" type="button" data-tip="tip-how" aria-expanded="false" aria-controls="tip-how" aria-label="Cómo funciona el marketplace">?</button>
+          </div>
           <button id="edit-market" class="btn btn-ghost" hidden>Editar</button>
         </div>
         <div id="market-form">
@@ -81,7 +84,10 @@
 
         <!-- Vender -->
         <section id="sell-view" class="card" hidden>
-          <h2>Publicar un NFT</h2>
+          <div class="title-tip">
+            <h2>Publicar un NFT</h2>
+            <button class="info-btn" type="button" data-tip="tip-reqs" aria-expanded="false" aria-controls="tip-reqs" aria-label="Qué NFTs y tokens se pueden usar">?</button>
+          </div>
           <p class="hint sell-intro">El NFT sigue en tu wallet. Autorizás al marketplace a transferirlo solo cuando alguien lo compre.</p>
 
           <div class="row">
@@ -120,6 +126,33 @@
       </div>
     </section>
   </main>
+
+  <!-- Ayudas (se abren con los botones "?") -->
+  <div id="tip-how" class="tip" role="note" hidden>
+    <p class="tip-title">Cómo funciona</p>
+    <ol class="tip-steps">
+      <li><strong>Publicás.</strong> Elegís precio y token, y autorizás al marketplace a mover tu NFT. El NFT sigue en tu wallet.</li>
+      <li><strong>Alguien compra.</strong> Autoriza el pago y confirma la compra.</li>
+      <li><strong>Intercambio.</strong> En una sola transacción los tokens van al vendedor y el NFT al comprador. Si algo falla, no se mueve nada.</li>
+    </ol>
+    <p class="tip-foot">El contrato no guarda tus NFTs ni tus tokens, no cobra comisión y nadie puede modificarlo. Podés retirar tu publicación cuando quieras.</p>
+  </div>
+
+  <div id="tip-reqs" class="tip" role="note" hidden>
+    <p class="tip-title">Qué se puede vender</p>
+    <p class="tip-sub">El NFT</p>
+    <ul>
+      <li>Un ERC-721 estándar en la misma red, como las entradas FestivalUNQ.</li>
+      <li>Tiene que ser tuyo.</li>
+      <li>No puede tener las transferencias bloqueadas (NFTs intransferibles).</li>
+    </ul>
+    <p class="tip-sub">El token de pago</p>
+    <ul>
+      <li>Un ERC-20 estándar en la misma red, como MC.</li>
+      <li>Evitá tokens que cobran comisión al transferir: el vendedor recibiría menos.</li>
+    </ul>
+    <p class="tip-foot">Para desarrolladores: el marketplace usa <code>ownerOf</code>, <code>approve</code> y <code>transferFrom</code> del NFT, y <code>transferFrom</code> del token.</p>
+  </div>
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
   <script type="module" src="app.js"></script>

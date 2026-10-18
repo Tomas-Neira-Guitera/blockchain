@@ -436,3 +436,48 @@ if (window.ethereum) {
   window.ethereum.on("chainChanged", () => location.reload());
   window.ethereum.request({ method: "eth_accounts" }).then((a) => a.length && connect());
 }
+
+/* ---------- Ayudas: se abren al pasar el mouse o al tocar el "?" ---------- */
+{
+  let open = null, pinned = false;
+  const canHover = matchMedia("(hover: hover)").matches;
+
+  function place(btn, tip) {
+    const r = btn.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const left = Math.max(16, Math.min(r.left + r.width / 2 - 28, innerWidth - w - 16));
+    tip.style.left = `${left}px`;
+    tip.style.top = `${r.bottom + 10}px`;
+    tip.style.setProperty("--arrow-x", `${r.left + r.width / 2 - left - 6}px`);
+  }
+  function show(btn, pin) {
+    if (open && open.btn !== btn) hide();
+    const tip = document.getElementById(btn.dataset.tip);
+    tip.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    place(btn, tip);
+    open = { btn, tip };
+    pinned = pinned || pin;
+  }
+  function hide() {
+    if (!open) return;
+    open.tip.hidden = true;
+    open.btn.setAttribute("aria-expanded", "false");
+    open = null; pinned = false;
+  }
+
+  document.querySelectorAll(".info-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (open?.btn === btn && pinned) hide(); else show(btn, true);
+    });
+    if (canHover) {
+      btn.addEventListener("mouseenter", () => show(btn, false));
+      btn.addEventListener("mouseleave", () => { if (!pinned) hide(); });
+    }
+  });
+  document.addEventListener("click", (e) => { if (open && !open.tip.contains(e.target)) hide(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") hide(); });
+  addEventListener("resize", () => open && place(open.btn, open.tip));
+  addEventListener("scroll", () => open && place(open.btn, open.tip), { passive: true });
+}
