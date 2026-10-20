@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DAO Centro de Estudiantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">Centro de Estudiantes</span>
+    <div id="wallet-chip" class="chip" hidden>
+      <span class="dot"></span>
+      <span id="chip-network"></span>
+      <span class="chip-sep"></span>
+      <button id="copy-address" class="chip-btn" title="Copiar dirección"></button>
+      <button id="disconnect" class="chip-btn subtle" title="Desconectar">Salir</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Bienvenida -->
+    <section id="connect-view" class="hero">
+      <div class="hero-stack" aria-hidden="true">
+        <div class="ballot b1">
+          <span class="b-line w70"></span><span class="b-line w45"></span>
+          <span class="b-opt yes"><span class="b-box">✓</span>Sí</span>
+          <span class="b-opt"><span class="b-box"></span>No</span>
+        </div>
+        <div class="ballot b2">
+          <span class="b-line w55"></span><span class="b-line w80"></span>
+          <span class="b-opt"><span class="b-box"></span>Sí</span>
+          <span class="b-opt no"><span class="b-box">✓</span>No</span>
+        </div>
+      </div>
+      <h1>Las decisiones del centro, votadas por todos</h1>
+      <p class="lead">Proponé ideas, votá con tu wallet y mirá los resultados. Un voto por estudiante, registrado en la blockchain.</p>
+      <button id="connect" class="btn btn-primary btn-lg">Conectar MetaMask</button>
+      <p id="no-metamask" class="hint" hidden>
+        No encontramos MetaMask en este navegador.
+        <a href="https://metamask.io/download/" target="_blank" rel="noopener">Instalá la extensión</a> y recargá la página.
+      </p>
+    </section>
+
+    <section id="app-view" hidden>
+      <!-- Red equivocada: la app funciona solo en Sepolia -->
+      <article class="card wrong-net" id="wrong-network" hidden>
+        <h2>Cambiá a Sepolia</h2>
+        <p class="hint">Esta DAO funciona solo en la red de prueba Sepolia, y tu MetaMask está en otra red.</p>
+        <button id="switch-network" class="btn btn-primary btn-block">Cambiar a Sepolia</button>
+      </article>
+
+      <!-- No se encontró el contrato -->
+      <article class="card wrong-net" id="no-dao" hidden>
+        <h2>No encontramos la DAO</h2>
+        <p class="hint" id="no-dao-msg"></p>
+      </article>
+
+      <!-- Resumen de la DAO -->
+      <article class="card" id="dao-card" hidden>
+        <div class="card-head">
+          <div class="title-tip">
+            <h2>DAO del centro</h2>
+            <button class="info-btn" type="button" data-tip="tip-how" aria-expanded="false" aria-controls="tip-how" aria-label="Cómo funcionan las votaciones">?</button>
+          </div>
+          <span id="role-badge" class="badge"></span>
+        </div>
+        <dl class="stats">
+          <div><dt>En el padrón</dt><dd id="stat-padron">–</dd></div>
+          <div><dt>Abiertas</dt><dd id="stat-abiertas">–</dd></div>
+          <div><dt>Propuestas</dt><dd id="stat-total">–</dd></div>
+        </dl>
+        <p id="role-hint" class="hint"></p>
+      </article>
+
+      <div id="dao-view" hidden>
+        <div class="tabs segmented segmented-lg" role="tablist">
+          <button role="tab" id="tab-votes" aria-selected="true">Votaciones</button>
+          <button role="tab" id="tab-propose" aria-selected="false">Proponer</button>
+          <button role="tab" id="tab-padron" aria-selected="false">Padrón</button>
+        </div>
+
+        <!-- Votaciones -->
+        <section id="votes-view">
+          <div class="list-head">
+            <div class="segmented" id="filters">
+              <button data-filter="abiertas" aria-pressed="true">Abiertas</button>
+              <button data-filter="cerrar" aria-pressed="false">Para cerrar</button>
+              <button data-filter="finalizadas" aria-pressed="false">Finalizadas</button>
+            </div>
+            <button id="refresh" class="btn btn-ghost">Actualizar</button>
+          </div>
+          <ul id="proposals" class="proposals"></ul>
+          <div id="empty" class="empty" hidden>
+            <p><strong id="empty-title"></strong></p>
+            <p class="hint" id="empty-hint"></p>
+          </div>
+        </section>
+
+        <!-- Proponer -->
+        <section id="propose-view" class="card" hidden>
+          <div class="title-tip">
+            <h2>Nueva propuesta</h2>
+            <button class="info-btn" type="button" data-tip="tip-propose" aria-expanded="false" aria-controls="tip-propose" aria-label="Quién puede votar una propuesta">?</button>
+          </div>
+          <p class="hint sell-intro">Cualquier estudiante del padrón puede proponer. La votación queda abierta durante el tiempo que elijas.</p>
+
+          <label class="field">
+            <span class="field-label">Título</span>
+            <input id="p-title" maxlength="120" placeholder="Ej: Comprar un microondas para el buffet" autocomplete="off">
+          </label>
+          <label class="field">
+            <span class="field-label">Descripción</span>
+            <textarea id="p-desc" rows="4" maxlength="1000" placeholder="Qué se propone, por qué y cuánto cuesta…"></textarea>
+          </label>
+          <div class="row">
+            <label class="field grow">
+              <span class="field-label">Duración de la votación</span>
+              <input id="p-dur" inputmode="numeric" value="3" autocomplete="off">
+            </label>
+            <label class="field unit-field">
+              <span class="field-label">&nbsp;</span>
+              <select id="p-unit">
+                <option value="60">minutos</option>
+                <option value="3600">horas</option>
+                <option value="86400" selected>días</option>
+              </select>
+            </label>
+          </div>
+          <p id="p-check" class="check"></p>
+          <button id="create" class="btn btn-primary btn-lg btn-block" disabled>Crear propuesta</button>
+        </section>
+
+        <!-- Padrón -->
+        <section id="padron-view" hidden>
+          <article class="card">
+            <h2 class="sub-h">Consultar una wallet</h2>
+            <label class="field">
+              <span class="field-label">Dirección</span>
+              <input id="q-addr" placeholder="0x…" spellcheck="false" autocomplete="off">
+            </label>
+            <p id="q-check" class="check"></p>
+          </article>
+
+          <article class="card" id="admin-card" hidden>
+            <h2 class="sub-h">Agregar estudiantes</h2>
+            <p class="hint sell-intro">Una dirección por línea (o separadas por coma). Las que ya estén en el padrón se ignoran.</p>
+            <label class="field">
+              <span class="field-label">Wallets</span>
+              <textarea id="add-list" rows="5" class="mono" placeholder="0x1234…&#10;0xabcd…" spellcheck="false"></textarea>
+            </label>
+            <p id="add-check" class="check"></p>
+            <button id="add" class="btn btn-primary btn-block" disabled>Agregar al padrón</button>
+
+            <hr>
+            <h2 class="sub-h">Quitar un estudiante</h2>
+            <label class="field">
+              <span class="field-label">Dirección</span>
+              <input id="rm-addr" placeholder="0x…" spellcheck="false" autocomplete="off">
+            </label>
+            <p id="rm-check" class="check"></p>
+            <button id="remove" class="btn btn-danger btn-block" disabled>Quitar del padrón</button>
+          </article>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <!-- Ayudas (se abren con los botones "?") -->
+  <div id="tip-how" class="tip" role="note" hidden>
+    <p class="tip-title">Cómo funciona</p>
+    <ol class="tip-steps">
+      <li><strong>Padrón.</strong> El admin del centro carga la wallet de cada estudiante. Una wallet = un voto.</li>
+      <li><strong>Propuesta.</strong> Un estudiante la crea con título, descripción y duración.</li>
+      <li><strong>Votación.</strong> Cada estudiante vota Sí o No una sola vez, hasta que termina el plazo.</li>
+      <li><strong>Cierre.</strong> Al vencer el plazo cualquiera la cierra y el resultado queda registrado.</li>
+    </ol>
+    <p class="tip-foot">Se aprueba si votó <strong>más de la mitad del padrón</strong> y hay más votos Sí que No. Si votaron menos, queda "Sin quórum". El empate se rechaza.</p>
+  </div>
+
+  <div id="tip-propose" class="tip" role="note" hidden>
+    <p class="tip-title">Quién puede votar</p>
+    <ul>
+      <li>Solo los estudiantes que ya están en el padrón cuando se crea la propuesta.</li>
+      <li>El quórum se calcula sobre el padrón de ese momento.</li>
+      <li>No se puede cerrar antes de tiempo: la votación dura lo que elijas.</li>
+    </ul>
+    <p class="tip-foot">Crear una propuesta es una transacción: pagás un poco de gas en ETH de Sepolia.</p>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
